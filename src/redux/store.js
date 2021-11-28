@@ -9,7 +9,7 @@ let rootReducer = combineReducers({
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
 const generateStore = function () {
-    let store = generateStore(
+    let store = createStore(
         rootReducer,
         composeEnhancers(
             applyMiddleware(thunk)
