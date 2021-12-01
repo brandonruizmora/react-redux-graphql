@@ -18,3 +18,7 @@ export const loginWithGoogle = async function () {
     const snap = await firebase.auth().signInWithPopup(provider);
     return snap.user;
 }
+
+export const signOutGoogle = function () {
+    firebase.auth().signOut();
+}

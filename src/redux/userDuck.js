@@ -1,4 +1,4 @@
-import { loginWithGoogle } from "../firebase";
+import { loginWithGoogle, signOutGoogle } from "../firebase";
 
 // constant
 const initalState = {
@@ -9,6 +9,9 @@ const initalState = {
 const LOGIN = "LOGIN";
 const LOGIN_SUCCESS = "LOGIN_SUCCESS";
 const LOGIN_ERROR = "LOGIN_ERROR";
+
+const LOGOUT = "LOGOUT";
+
 
 // reducer
 const reducer = function (state = initalState, action) {
@@ -35,6 +38,11 @@ const reducer = function (state = initalState, action) {
                 error: action.payload
             }
 
+        case LOGOUT:
+            return {
+                ...initalState
+            }
+
         default:
             return state;
     }
@@ -48,9 +56,13 @@ const saveStorage = function (storage) {
     localStorage.storage = JSON.stringify(storage)
 }
 
+const removeStorage = function () {
+    localStorage.removeItem("storage");
+}
+
 // action
 export const restoreSessionAction = function () {
-    return ( dispatch ) => {
+    return (dispatch) => {
         let storage = localStorage.getItem("storage");
         storage = JSON.parse(storage);
         if (storage && storage.user) {
@@ -85,5 +97,15 @@ export const doLoginWithGoogleAction = function () {
                 payload: e.message
             })
         })
+    }
+}
+
+export const dologoutAction = function () {
+    signOutGoogle();
+    return (dispatch) => {
+        dispatch({
+            type: LOGOUT
+        });
+        removeStorage();
     }
 }
