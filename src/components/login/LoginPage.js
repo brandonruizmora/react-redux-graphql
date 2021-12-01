@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { doLoginWithGoogleAction } from '../../redux/userDuck'
 import styles from './login.module.css'
 
-const LoginPage = ({ fetching, doLoginWithGoogleAction }) => {
+const LoginPage = ({ fetching, logged, doLoginWithGoogleAction }) => {
 
     const handleClickLogin = () => {
         doLoginWithGoogleAction()
@@ -13,25 +13,35 @@ const LoginPage = ({ fetching, doLoginWithGoogleAction }) => {
 
     return (
         <div className={styles.container}>
-            <h1>
-                Inicia Sesión con Google
-            </h1>
-            <h1>
-                Cierra tu sesión
-            </h1>
-            <button onClick={ handleClickLogin }>
-                Iniciar
-            </button>
-            <button>
-                Cerrar Sesión
-            </button>
+            {
+                logged ? (
+                    <>
+                        <h1>
+                            Cierra tu sesión
+                        </h1>
+                        <button>
+                            Cerrar Sesión
+                        </button>
+                    </>
+                ) : (
+                    <>
+                        <h1>
+                            Inicia Sesión con Google
+                        </h1>
+                        <button onClick={handleClickLogin}>
+                            Iniciar
+                        </button>
+                    </>
+                )
+            }
         </div>
     )
 }
 
-const mapStateToProps = function ({ user: { fetching }}) {
+const mapStateToProps = function ({ user: { fetching, logged } }) {
     return {
-        fetching
+        fetching,
+        logged
     }
 }
 

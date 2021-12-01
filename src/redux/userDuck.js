@@ -11,7 +11,6 @@ const LOGIN_SUCCESS = "LOGIN_SUCCESS";
 const LOGIN_ERROR = "LOGIN_ERROR";
 
 // reducer
-
 const reducer = function (state = initalState, action) {
 
     switch (action.type) {
@@ -45,12 +44,24 @@ const reducer = function (state = initalState, action) {
 export default reducer;
 
 //auxiliar
-
 const saveStorage = function (storage) {
     localStorage.storage = JSON.stringify(storage)
 }
 
 // action
+export const restoreSessionAction = function () {
+    return ( dispatch ) => {
+        let storage = localStorage.getItem("storage");
+        storage = JSON.parse(storage);
+        if (storage && storage.user) {
+            dispatch({
+                type: LOGIN_SUCCESS,
+                payload: storage.user
+            })
+        }
+    }
+}
+
 export const doLoginWithGoogleAction = function () {
     return (dispatch, getState) => {
         dispatch({
