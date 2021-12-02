@@ -17,6 +17,8 @@ const REMOVE_CHARACTER = "REMOVE_CHARACTER";
 
 const ADD_FAV_CHARACTER = "ADD_FAV_CHARACTER";
 
+const REMOVE_FAV_CHARACTER = "REMOVE_FAV_CHARACTER";
+
 // reducer
 const reducer = function (state = initialState, action) {
 
@@ -49,6 +51,12 @@ const reducer = function (state = initialState, action) {
             }
 
         case ADD_FAV_CHARACTER:
+            return {
+                ...state,
+                ...action.payload
+            }
+
+        case REMOVE_FAV_CHARACTER:
             return {
                 ...state,
                 ...action.payload
@@ -98,10 +106,19 @@ export const removeCharacterAction = function () {
 
 export const addToFavoritesAction = () => (dispatch, getState) => {
     const { characters, favorites } = getState().character;
-    console.log(getState)
     const character = characters.shift();
     dispatch({
         type: ADD_FAV_CHARACTER,
         payload: { characters: [...characters], favorites: [...favorites, character] }
+    })
+}
+
+export const removeFavoriteAction = (id) => (dispatch, getState) => {
+    console.log(id)
+    const { characters, favorites } = getState().character;
+    const character = favorites.shift();
+    dispatch({
+        type: REMOVE_FAV_CHARACTER,
+        payload: { characters: [...characters, character], favorites: [...favorites] }
     })
 }

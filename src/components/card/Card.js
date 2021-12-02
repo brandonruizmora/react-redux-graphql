@@ -10,8 +10,9 @@ function onClick(side) {
 }
 
 export default function Card({
-    name, image, rightClick, leftClick
+    name, image, rightClick, leftClick, hide
 }) {
+    console.log(hide)
     return (
         <div className={styles.container}>
             <div className={styles.card}>
@@ -19,24 +20,26 @@ export default function Card({
                 <p className={styles.name}>
                     {name}
                 </p>
-                <div className={styles.actions}>
-                    <div
-                        onClick={leftClick || onClick("left")}
-                        className={styles.left}>
-                        <FontAwesome
-                            name="thumbs-down"
-                            size="2x"
-                        />
+                {!hide && (
+                    <div className={styles.actions}>
+                        <div
+                            onClick={leftClick || onClick("left")}
+                            className={styles.left}>
+                            <FontAwesome
+                                name="thumbs-down"
+                                size="2x"
+                            />
+                        </div>
+                        <div
+                            onClick={rightClick || onClick("right")}
+                            className={styles.right}>
+                            <FontAwesome
+                                name="heart"
+                                size="2x"
+                            />
+                        </div>
                     </div>
-                    <div
-                        onClick={rightClick || onClick("right")}
-                        className={styles.right}>
-                        <FontAwesome
-                            name="heart"
-                            size="2x"
-                        />
-                    </div>
-                </div>
+                )}
             </div>
         </div>
     )
