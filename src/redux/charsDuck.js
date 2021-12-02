@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { updateDB } from '../firebase';
 
 // constantes
 const initialState = {
@@ -106,7 +107,9 @@ export const removeCharacterAction = function () {
 
 export const addToFavoritesAction = () => (dispatch, getState) => {
     const { characters, favorites } = getState().character;
+    const { uid } = getState().user;
     const character = characters.shift();
+    updateDB([...favorites, character], uid);
     dispatch({
         type: ADD_FAV_CHARACTER,
         payload: { characters: [...characters], favorites: [...favorites, character] }
