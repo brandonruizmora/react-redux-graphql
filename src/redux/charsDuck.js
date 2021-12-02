@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { updateDB } from '../firebase';
+import { getFavoritesDB, updateDB } from '../firebase';
 
 // constantes
 const initialState = {
@@ -19,6 +19,10 @@ const REMOVE_CHARACTER = "REMOVE_CHARACTER";
 const ADD_FAV_CHARACTER = "ADD_FAV_CHARACTER";
 
 const REMOVE_FAV_CHARACTER = "REMOVE_FAV_CHARACTER";
+
+const GET_FAVS = "GET_FAVS";
+const GET_FAVS_SUCCESS = "GET_FAVS_SUCCESS";
+const GET_FAVS_ERROR = "GET_FAVS_ERROR";
 
 // reducer
 const reducer = function (state = initialState, action) {
@@ -62,6 +66,26 @@ const reducer = function (state = initialState, action) {
                 ...state,
                 ...action.payload
             }
+
+            case GET_FAVS:
+                return {
+                    ...state,
+                    fetching: true
+                }
+
+                case GET_FAVS_ERROR:
+                return {
+                    ...state,
+                    fetching: false,
+                    error: action.payload
+                }
+
+                case GET_FAVS_SUCCESS:
+                return {
+                    ...state,
+                    fetching: false,
+                    favorites: action.payload
+                }
 
         default:
             return state;
@@ -123,5 +147,24 @@ export const removeFavoriteAction = (id) => (dispatch, getState) => {
     dispatch({
         type: REMOVE_FAV_CHARACTER,
         payload: { characters: [...characters, character], favorites: [...favorites] }
+    })
+}
+
+export const retrieveFavoritesAction = () => (dispatch, getState) => {
+    dispatch({
+        type: GET_FAVS
+    });
+    const { uid } = getState().user;
+    return getFavoritesDB(uid).then(favorites => {
+        dispatch({
+            type: GET_FAVS_SUCCESS,
+            payload: [...favorites]
+        })
+    }).catch(e => {
+        console.error(e);
+        dispatch({
+            type: GET_FAVS_ERROR,
+            payload: e.message
+        });
     })
 }

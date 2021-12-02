@@ -23,6 +23,12 @@ export const updateDB = (favorites, uid) => {
 
 }
 
+export const getFavoritesDB = async (uid) => {
+    const snap = await db.doc(uid).get();
+    return snap.data().favorites;
+
+}
+
 export const loginWithGoogle = async function () {
     let provider = new firebase.auth.GoogleAuthProvider();
     const snap = await firebase.auth().signInWithPopup(provider);
