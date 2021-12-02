@@ -4,7 +4,8 @@ import axios from 'axios'
 const initialState = {
     fetching: false,
     characters: [],
-    current: {}
+    current: {},
+    favorites: []
 };
 
 const URL = "https://rickandmortyapi.com/api/character";
@@ -13,6 +14,8 @@ const GET_CHARACTERS_SUCCESS = "GET_CHARACTERS_SUCCESS";
 const GET_CHARACTERS_ERROR = "GET_CHARACTERS_ERROR";
 
 const REMOVE_CHARACTER = "REMOVE_CHARACTER";
+
+const ADD_FAV_CHARACTER = "ADD_FAV_CHARACTER";
 
 // reducer
 const reducer = function (state = initialState, action) {
@@ -32,17 +35,23 @@ const reducer = function (state = initialState, action) {
                 fetching: false
             }
 
-            case GET_CHARACTERS_ERROR: 
+        case GET_CHARACTERS_ERROR:
             return {
                 ...state,
                 fetching: false,
                 error: action.payload
             }
 
-            case REMOVE_CHARACTER: 
+        case REMOVE_CHARACTER:
             return {
                 ...state,
                 characters: action.payload
+            }
+
+        case ADD_FAV_CHARACTER:
+            return {
+                ...state,
+                ...action.payload
             }
 
         default:
@@ -76,13 +85,23 @@ export const getCharactersAction = function () {
 
 export const removeCharacterAction = function () {
 
-    return ( dispatch, getState ) => {
+    return (dispatch, getState) => {
         const { characters } = getState().character;
         characters.shift();
         dispatch({
             type: REMOVE_CHARACTER,
-            payload: [ ...characters ]
+            payload: [...characters]
         })
     }
-    
+
+}
+
+export const addToFavoritesAction = () => (dispatch, getState) => {
+    const { characters, favorites } = getState().character;
+    console.log(getState)
+    const character = characters.shift();
+    dispatch({
+        type: ADD_FAV_CHARACTER,
+        payload: { characters: [...characters], favorites: [...favorites, character] }
+    })
 }
