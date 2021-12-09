@@ -1,10 +1,13 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Card from '../card/Card'
 import { gql } from 'apollo-boost'
 import { useQuery } from 'react-apollo'
 
 
 const GraphQLHomePage = () => {
+
+    const [characters, setCharacters] = useState([])
+
     const query = gql`
     query {
         characters {
@@ -15,13 +18,25 @@ const GraphQLHomePage = () => {
         }
       }
     `
-    const { data, loading, error } = useQuery(query);
-    console.error(error);
+    const { data, loading, error } = useQuery(query)
+
+    useEffect(() => {
+        if (data && !loading && !error) {
+            setCharacters([...data.characters.results]);
+        }
+    }, [data, loading, error])
+
+    const handleLeftClick = function () {
+        characters.shift();
+        setCharacters([...characters]);
+    }
+
     if (loading) return <h2>Cargando...</h2>
-    if (error) return <h2>Error on fetching</h2>
+
     return (
         <Card
-            {...data.characters.results[0]}
+            leftClick={handleLeftClick}
+            {...characters[0]}
         />
     )
 }
