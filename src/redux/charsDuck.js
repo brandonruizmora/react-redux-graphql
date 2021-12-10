@@ -7,7 +7,8 @@ const initialState = {
     fetching: false,
     characters: [],
     current: {},
-    favorites: []
+    favorites: [],
+    page: 1
 };
 
 // const URL = "https://rickandmortyapi.com/api/character";
@@ -24,6 +25,8 @@ const REMOVE_FAV_CHARACTER = "REMOVE_FAV_CHARACTER";
 const GET_FAVS = "GET_FAVS";
 const GET_FAVS_SUCCESS = "GET_FAVS_SUCCESS";
 const GET_FAVS_ERROR = "GET_FAVS_ERROR";
+
+const UPDATE_PAGE = "UPDATE_PAGE";
 
 const client = new ApolloClient({
     uri: 'https://rickandmortyapi.com/graphql',
@@ -92,6 +95,12 @@ const reducer = function (state = initialState, action) {
                 favorites: action.payload
             }
 
+        case UPDATE_PAGE:
+            return {
+                ...state,
+                page: action.payload
+            }
+
         default:
             return state;
     }
@@ -103,23 +112,34 @@ export default reducer;
 // actions (thunks)
 export const getCharactersAction = function () {
 
-    return async (dispatch, _getState) => {
+    return async (dispatch, getState) => {
         const query = gql`
-        query {
-            characters {
-                results {
-                    name,
-                    image
-                }
+        query ($page: Int) {
+            characters(page: $page) {
+              info {
+                pages
+                next
+                prev
+              }
+              results {
+                name
+                image
+              }
             }
-        }
+          }
         `;
 
         dispatch({
             type: GET_CHARACTERS
         });
+
+        const { page } = getState().character;
+
         return client.query({
-            query
+            query,
+            variables: {
+                page
+            }
         }).then(({ data, error }) => {
             if (error) {
                 dispatch({
@@ -130,6 +150,10 @@ export const getCharactersAction = function () {
                 dispatch({
                     type: GET_CHARACTERS_SUCCESS,
                     payload: data.characters.results
+                });
+                dispatch({
+                    type: UPDATE_PAGE,
+                    payload: data.characters.info.next ? data.characters.info.next : 1
                 });
             }
 
@@ -160,10 +184,14 @@ export const removeCharacterAction = function () {
     return (dispatch, getState) => {
         const { characters } = getState().character;
         characters.shift();
-        dispatch({
-            type: REMOVE_CHARACTER,
-            payload: [...characters]
-        })
+        if (!characters.length) {
+            getCharactersAction()(dispatch, getState);
+        } else {
+            dispatch({
+                type: REMOVE_CHARACTER,
+                payload: [...characters]
+            })
+        }
     }
 
 }
@@ -180,7 +208,6 @@ export const addToFavoritesAction = () => (dispatch, getState) => {
 }
 
 export const removeFavoriteAction = (id) => (dispatch, getState) => {
-    console.log(id)
     const { characters, favorites } = getState().character;
     const character = favorites.shift();
     dispatch({
