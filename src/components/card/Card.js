@@ -12,7 +12,6 @@ function onClick(side) {
 export default function Card({
     name, image, rightClick, leftClick, hide
 }) {
-    console.log(hide)
     return (
         <div className={styles.container}>
             <div className={styles.card}>

@@ -4,7 +4,7 @@ import Home from './components/home/HomePage'
 import FavPage from './components/favs/FavPage'
 import LoginPage from './components/login/LoginPage'
 import { connect } from 'react-redux'
-import GraphQLHomePage from './components/home/GraphQLHomePage'
+// import GraphQLHomePage from './components/home/GraphQLHomePage'
 
 const PrivateRoute = ({ path, component, logged, ...rest }) => {
 
@@ -28,7 +28,7 @@ const PrivateRoute = ({ path, component, logged, ...rest }) => {
 const Routes = ({ logged }) => {
     return (
         <Switch>
-            <PrivateRoute exact path="/" component={GraphQLHomePage} logged={logged} />
+            <PrivateRoute exact path="/" component={Home} logged={logged} />
             <PrivateRoute path="/favs" component={FavPage} logged={logged} />
             <Route path="/login" component={LoginPage} />
         </Switch>

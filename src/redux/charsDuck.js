@@ -1,5 +1,6 @@
-import axios from 'axios'
+// import axios from 'axios'
 import { getFavoritesDB, updateDB } from '../firebase';
+import ApolloClient, { gql } from 'apollo-boost';
 
 // constantes
 const initialState = {
@@ -9,7 +10,7 @@ const initialState = {
     favorites: []
 };
 
-const URL = "https://rickandmortyapi.com/api/character";
+// const URL = "https://rickandmortyapi.com/api/character";
 const GET_CHARACTERS = "GET_CHARACTERS";
 const GET_CHARACTERS_SUCCESS = "GET_CHARACTERS_SUCCESS";
 const GET_CHARACTERS_ERROR = "GET_CHARACTERS_ERROR";
@@ -23,6 +24,10 @@ const REMOVE_FAV_CHARACTER = "REMOVE_FAV_CHARACTER";
 const GET_FAVS = "GET_FAVS";
 const GET_FAVS_SUCCESS = "GET_FAVS_SUCCESS";
 const GET_FAVS_ERROR = "GET_FAVS_ERROR";
+
+const client = new ApolloClient({
+    uri: 'https://rickandmortyapi.com/graphql',
+});
 
 // reducer
 const reducer = function (state = initialState, action) {
@@ -67,25 +72,25 @@ const reducer = function (state = initialState, action) {
                 ...action.payload
             }
 
-            case GET_FAVS:
-                return {
-                    ...state,
-                    fetching: true
-                }
+        case GET_FAVS:
+            return {
+                ...state,
+                fetching: true
+            }
 
-                case GET_FAVS_ERROR:
-                return {
-                    ...state,
-                    fetching: false,
-                    error: action.payload
-                }
+        case GET_FAVS_ERROR:
+            return {
+                ...state,
+                fetching: false,
+                error: action.payload
+            }
 
-                case GET_FAVS_SUCCESS:
-                return {
-                    ...state,
-                    fetching: false,
-                    favorites: action.payload
-                }
+        case GET_FAVS_SUCCESS:
+            return {
+                ...state,
+                fetching: false,
+                favorites: action.payload
+            }
 
         default:
             return state;
@@ -97,23 +102,57 @@ export default reducer;
 
 // actions (thunks)
 export const getCharactersAction = function () {
+
     return async (dispatch, _getState) => {
+        const query = gql`
+        query {
+            characters {
+                results {
+                    name,
+                    image
+                }
+            }
+        }
+        `;
+
         dispatch({
             type: GET_CHARACTERS
         });
-        try {
-            const result = await axios.get(URL);
-            dispatch({
-                type: GET_CHARACTERS_SUCCESS,
-                payload: result.data.results
-            });
-        } catch (error) {
-            dispatch({
-                type: GET_CHARACTERS_ERROR,
-                payload: error.message
-            });
-        }
+        return client.query({
+            query
+        }).then(({ data, error }) => {
+            if (error) {
+                dispatch({
+                    type: GET_CHARACTERS_ERROR,
+                    payload: error.message
+                });
+            } else {
+                dispatch({
+                    type: GET_CHARACTERS_SUCCESS,
+                    payload: data.characters.results
+                });
+            }
+
+        })
     }
+
+    // return async (dispatch, _getState) => {
+    //     dispatch({
+    //         type: GET_CHARACTERS
+    //     });
+    //     try {
+    //         const result = await axios.get(URL);
+    //         dispatch({
+    //             type: GET_CHARACTERS_SUCCESS,
+    //             payload: result.data.results
+    //         });
+    //     } catch (error) {
+    //         dispatch({
+    //             type: GET_CHARACTERS_ERROR,
+    //             payload: error.message
+    //         });
+    //     }
+    // }
 }
 
 export const removeCharacterAction = function () {
